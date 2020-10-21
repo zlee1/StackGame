@@ -1,3 +1,18 @@
+import os
+
+# End the game
+def endGame():
+    print("Thanks for playing!")
+    os._exit(0)
+
+# Recursively find the minimum number of moves required to win
+def minMoves(max):
+    if(max == 1):
+        return 1
+    # User needs to move every disc on top of bottom one off, then move bottom,
+    # then move everything else back on.
+    return 2*minMoves(max-1) + 1
+
 # Draw the board.
 def draw(p1, p2, p3):
     # This is the total number of discs.
@@ -58,8 +73,14 @@ def turn(p1, p2, p3):
     # Repeat as long as a valid move has not been made.
     while(not success):
         try:
+            # Account for user entering 0 to end game early
             a = int(input("Move from pillar (1-3): ")) - 1
+            if(a == -1):
+                endGame()
+
             b = int(input("To pillar (1-3): ")) - 1
+            if(b == -1):
+                endGame()
 
             # If a valid move has been selected, make the move and end the loop.
             if checkValidMove(p1, p2, p3, a, b):
@@ -93,6 +114,12 @@ def run(n):
     draw(p1, p2, p3)
     print("You won in {} turns!".format(turns))
 
+    # Check to see how user's number of moves compares to minimum number of moves.
+    if(turns == minMoves(n)):
+        print("Great job, you beat the game in the fewest turns possible!")
+    else:
+        print("You took " + str(turns-minMoves(n)) + " more turns than you needed to.")
+
 
 if __name__ == "__main__":
     print("The object of this game is to move all discs from one pillar to another.")
@@ -101,6 +128,12 @@ if __name__ == "__main__":
     print("from (Pillar A) and a pillar to move to (Pillar B). If your entered")
     print("move is valid, the top disc from Pillar A will be moved to Pillar B.")
     print("Once all discs are on a different pillar than the initial one, you win!")
+    print("Enter \"0\" at any time to stop playing.")
     print()
+
     n = int(input("Enter the number of discs do you wish to play with: "))
+    if(n <= 0):
+        endGame()
+
+    print("\nA game of " + str(n) + " discs can be completed in " + str(minMoves(n)) + " moves. Good luck!")
     run(n)
